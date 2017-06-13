@@ -23,12 +23,12 @@ angular.module('app').directive('messageList', function($rootScope, $anchorScrol
 
         //ngNotify.set('Loading previous messages...','success');
 
-        var currentMessage = scope.messages[0].uuid;
+        var currentMessage = scope.messages[0].uuid.toString();
 
-          scope.messages.$load(20).then(function(){
+        scope.messages.$load(20).then(function(){
 
           // Scroll to the previous message 
-          $anchorScroll(currentMessage);
+          _.defer( function(){ $anchorScroll(currentMessage) });
 
         });
 
@@ -64,12 +64,10 @@ angular.module('app').directive('messageList', function($rootScope, $anchorScrol
       init();
 
     },
-    controller: function($scope, $state, Friends, Conversations, $stateParams){
+    controller: function($scope){
 
  
       $scope.autoScrollDown = true;
-
-      //$scope.messages.$destroy();
 
       // Hook that is called once the list is completely rendered
       $scope.listDidRender = function(){

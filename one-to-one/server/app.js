@@ -40,7 +40,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
  | Setting up PubNub
  |--------------------------------------------------------------------------
 */
-
+ 
   console.log('------------ Initing PubNub ----------------')
   pubnub = pubnub.init({
     subscribe_key: process.env.PUBNUB_SUBSCRIBE_KEY,
@@ -55,8 +55,8 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
   console.log('------------ Granting channel group manage permission to the server ----------------')
   pubnub.grant({
                   channel_group: ':',  // The wildcard ':' will grant access to any channel group
-                  auth_key: process.env.SERVER_PUBNUB_AUTH_KEY,
-                  manage: true,
+                  auth_key: process.env.SERVER_PUBNUB_AUTH_KEY, 
+                  manage: true, 
                   read: true,
                   write: true,
                   ttl: 0,
@@ -157,7 +157,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
     });
   });
-
+  
   /*
  |--------------------------------------------------------------------------
  | GET /api/friends
@@ -165,7 +165,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 */
 
   app.get('/api/friends', ensureAuthenticated, function(req, res) {
-  //  console.log(">>>>>>>>>>", req);
+
     var github_client = github.client(req.user.oauth_token);
     github_client.requestDefaults['qs'] = {page:1, per_page: 100};
     var ghme = github_client.me()
@@ -176,7 +176,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
           ghme.following(function(err, following){
 
-              if (!err && res.statusCode == 200){
+              if (!err && res.statusCode == 200){  
 
                 var friends = _.unionWith(followers,following, function(friend1,friend2){
                     return friend1.id == friend2.id
@@ -192,36 +192,76 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
                 // We merge to the friends objects the name of the channel used for the direct conversation
                 var friends = _.map(friends, function(friend){
-                  return _.merge(friend, { direct_conversation_channel: getDirectConversationChannelName(friend.id, req.user._id) })
+                  return _.merge(friend, { direct_conversation_channel: getDirectConversationChannelName(friend.id, req.user._id) })    
                 })
-
-
+                
                 Q.all([
-                        createOwnUserConversationsPresenceChannelGroup(req.user, friends),
+                        createOwnUserConversationsChannelGroup(req.user, friends),
                         createOwnUserFriendsPresenceChannelGroup(req.user, friends),
                         allowUserToPublishToConversationChannels(req.user, friends)
                       ]).then(function(){
-                        console.log(">>>>>>>>>>", friends);
                           res.status(200).send(friends);
-                      }).catch(function(err){
-                        console.log("<<<<<<<", err);
+                      }).catch(function(){
                            res.status(500).send();
                       })
 
               }
               else{
-                console.log("mast mast do nain ");
                 res.status(500).send();
               }
-          });
+          }); 
 
         }
         else{
           res.status(500).send();
         }
 
-    });
+    }); 
 
+  });
+
+  /*
+ |--------------------------------------------------------------------------
+ | GET /api/conversation
+ |--------------------------------------------------------------------------
+*/
+
+  app.get('/api/conversations', ensureAuthenticated, function(req, res) {
+
+    var conversations = [
+      { name: 'General', parameterized_name: 'general', type: 'channel', channel: 'conversation_channel_general' },
+      { name: 'Random', parameterized_name: 'random', type: 'channel', channel: 'conversation_channel_random' },
+      { name: 'Questions', parameterized_name: 'questions', type: 'channel', channel: 'conversation_channel_questions' },
+      { name: 'AngularJS', parameterized_name: 'angularjs', type: 'channel', channel: 'conversation_channel_angularjs' },
+      { name: 'PubNub', parameterized_name: 'pubnub', type: 'channel', channel: 'conversation_channel_pubnub' }
+    ]
+
+    conversationsChannels = _.map(conversations, function(conversation){ return conversation.channel });
+
+    // Allow the user to publish in the channels
+    var allowUserToPublishInChannelsPromise =  grant({
+              channel: conversationsChannels, 
+              auth_key: req.user.oauth_token, 
+              read: true, 
+              write: true,
+              ttl: 0
+            })
+
+
+    Q.all([ 
+      addConversationsToConversationChannelGroup(req.user, conversationsChannels), 
+      allowUserToPublishInChannelsPromise
+    ])
+    .then(function(){
+
+      res.status(200).send(conversations);
+
+    })
+    .catch(function(){
+      
+      res.status(500).send();
+    
+    });
   });
 
 
@@ -230,16 +270,16 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
  | Logout
  |--------------------------------------------------------------------------
 */
-
+  
   app.post('/logout', ensureAuthenticated, function(req, res) {
-
+    
     // Revoke access to the Access token
     // https://developer.github.com/v3/oauth_authorizations/#reset-an-authorization
     // POST /applications/:client_id/tokens/:access_token
     var resetTokenUrl = "https://api.github.com/applications/"+process.env.GITHUB_CLIENT_ID+'/tokens/'+ req.user.oauth_token;
     var authorization = new Buffer(process.env.GITHUB_CLIENT_ID + ":" + process.env.GITHUB_CLIENT_SECRET).toString("base64");
 
-    var headers = {
+    var headers = { 
       "Authorization": "Basic "+authorization,
       'User-Agent': 'NodeJS'
     }
@@ -250,7 +290,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
              revokeAccess(req.user).then(function(){
               db.users.update({ oauth_token: req.user.oauth_token }, { $set: { oauth_token: null } } )
-              res.status(200).send();
+              res.status(200).send(); 
              }).catch(function(){
                 res.status(500).send();
              })
@@ -273,8 +313,6 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
       'readOnly': [],
       'writeOnly': [],
       'readAndWrite': [
-                        'conversation_channel_general',
-                        'conversation_channel_general-pnpres',
                         'user_presence_' + user._id,
                         'user_presence_' + user._id + '-pnpres',
                       ]
@@ -288,7 +326,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
  |--------------------------------------------------------------------------
 */
 
-  // There is no concept of write access with channel groups.
+  // There is no concept of write access with channel groups. 
   // You can only subscribe or manage a channel group
   var getProtectedChannelGroupList = function(user){
     return _.join([
@@ -328,15 +366,15 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
   var grantAccess = function(user){
 
       return grant({
-              channel: getProtectedChannelList(user)['readAndWrite'],
-              auth_key: user.oauth_token,
-              read: true,
+              channel: getProtectedChannelList(user)['readAndWrite'], 
+              auth_key: user.oauth_token, 
+              read: true, 
               write: true,
               ttl: 0
             }).then(grant({
-              channel_group: getProtectedChannelGroupList(user),
-              auth_key: user.oauth_token,
-              read: true,
+              channel_group: getProtectedChannelGroupList(user), 
+              auth_key: user.oauth_token, 
+              read: true, 
               ttl: 0
             }));
   };
@@ -360,17 +398,43 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
       }
 
-      return revoke({
+      return revoke({ 
 
-          channel: getProtectedChannelList(user)['readAndWrite'],
+          channel: getProtectedChannelList(user)['readAndWrite'], 
           auth_key: user.oauth_token
-
+        
         }).then(revoke({
-
-              channel_group: getProtectedChannelGroupList(user),
-              auth_key: user.oauth_token,
+              
+              channel_group: getProtectedChannelGroupList(user), 
+              auth_key: user.oauth_token, 
         }));
   };
+
+
+
+  /*
+   |--------------------------------------------------------------------------
+   | Add the given conversations to the user conversation channel group
+   |--------------------------------------------------------------------------
+  */
+  
+  var addConversationsToConversationChannelGroup = function(user, conversations){
+
+      var deferred = Q.defer();
+
+      // The name of the channel used by the user to group all the conversations
+      var user_conversation_channel_group = 'conversations_' + user._id;
+
+      pubnub.channel_group_add_channel({
+        callback: function(res){ deferred.resolve(res)},
+        error: function(res){ deferred.reject(res) },
+        channel_group: user_conversation_channel_group,
+        channel: conversations
+      }); 
+
+      return deferred.promise;
+
+  }
 
 
   /*
@@ -381,12 +445,12 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
   // All the friends are automatically publishing their presence status to their own presence channel called userID_presence
   // We aggregate their presence events in the own user channel group called userID_friends_presence
-  // The user subscribe to this channel group to to see his friends online/offline status be updated in realtime.
-
+  // The user subscribe to this channel group to to see his friends online/offline status be updated in realtime. 
+  
   var createOwnUserFriendsPresenceChannelGroup = function(user, friends){
 
       var deferred = Q.defer();
-
+        
       var friends_presence_channels = _.map(friends, function(friend){ return "user_presence_" + friend.id });
       var user_friends_presence_channel = 'friends_presence_' + user._id
 
@@ -395,7 +459,35 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
         error: function(res){ deferred.reject(res) },
         channel_group: user_friends_presence_channel,
         channel: friends_presence_channels
-      });
+      }); 
+
+      return deferred.promise;
+
+  }
+
+  /*
+   |--------------------------------------------------------------------------
+   | Create the own user channel group
+   |--------------------------------------------------------------------------
+  */
+
+  // All the friends are automatically publishing their presence status to their own presence channel called userID_presence
+  // We aggregate their presence events in the own user channel group called userID_friends_presence
+  // The user subscribe to this channel group to to see his friends online/offline status be updated in realtime. 
+  
+  var createOwnUserFriendsPresenceChannelGroup = function(user, friends){
+
+      var deferred = Q.defer();
+        
+      var friends_presence_channels = _.map(friends, function(friend){ return "user_presence_" + friend.id });
+      var user_friends_presence_channel = 'friends_presence_' + user._id
+
+      pubnub.channel_group_add_channel({
+        callback: function(res){ deferred.resolve(res) },
+        error: function(res){ deferred.reject(res) },
+        channel_group: user_friends_presence_channel,
+        channel: friends_presence_channels
+      }); 
 
       return deferred.promise;
 
@@ -409,18 +501,16 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
   // All the friends are automatically publishing their presence status to their own presence channel called userID_presence
   // We aggregate their presence events in the own user channel group called userID_friends_presence
-  // The user subscribe to this channel group to to see his friends online/offline status be updated in realtime.
-
-  var createOwnUserConversationsPresenceChannelGroup = function(user, friends){
+  // The user subscribe to this channel group to to see his friends online/offline status be updated in realtime. 
+  
+  var createOwnUserConversationsChannelGroup = function(user, friends){
 
       var deferred = Q.defer();
-
+      
       // The list of channels used for the 1-1 conversations
       var direct_conversation_channels = _.map(friends, function(friend){
-        return getDirectConversationChannelName(user._id, friend.id)
+        return getDirectConversationChannelName(user._id, friend.id) 
       });
-
-      direct_conversation_channels.push('conversation_channel_general');
 
       // The name of the channel used by the user to group all the conversations
       var user_conversation_channel_group = 'conversations_' + user._id;
@@ -430,7 +520,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
         error: function(res){ deferred.reject(res) },
         channel_group: user_conversation_channel_group,
         channel: direct_conversation_channels
-      });
+      }); 
 
       return deferred.promise;
 
@@ -443,20 +533,20 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
    |--------------------------------------------------------------------------
   */
 
-   // This method allow the user to publish to its conversation channels
+   // This method allow the user to publish to its conversation channels 
    // By granting the access to all the channels
 
    var allowUserToPublishToConversationChannels = function(user, friends){
 
       return grant({
-              channel: getDirectConversationChannelList(user, friends),
-              auth_key: user.oauth_token,
-              read: true,
+              channel: getDirectConversationChannelList(user, friends), 
+              auth_key: user.oauth_token, 
+              read: true, 
               write: true,
               ttl: 0
             });
 
-   };
+   }; 
 
 
 
@@ -470,7 +560,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
       return _.map(channels, function(channel){
          return channel+'-pnpres';
-     })
+     }) 
   }
 
 
@@ -484,7 +574,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
 
       return _.map(friends, function(friend){
          return getDirectConversationChannelName(user._id, friend.id);
-     })
+     }) 
   }
 
 
@@ -497,7 +587,7 @@ db.users = new Datastore({ filename: 'db/users.db', autoload: true });
   // This function return the name of the channel used for a 1-1 chat between two people
   // The pattern is : conversation_direct_userID1_userID2
   // With user userID1 alphabetically lower than userID2
-
+  
   var getDirectConversationChannelName = function(userID1, userID2){
 
     var order = userID1.toString() < userID2.toString();
