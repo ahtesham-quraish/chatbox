@@ -1,11 +1,11 @@
 angular.module('app')
 .factory('Friends', ['$rootScope', 'Pubnub','currentUser', '$http', '$q', 'config',
  function FriendsService($rootScope, Pubnub, currentUser, $http, $q, config) {
-
+  
   // Aliasing this by self so we can access to this trough self in the inner functions
   var self = this;
   this.friends = []
-  this.channel_group = 'friends_presence_' + currentUser.get().id.toString()
+  this.channel_group = 'friends_presence_' + currentUser.get().id.toString() 
 
 /*
  |--------------------------------------------------------------------------
@@ -14,8 +14,7 @@ angular.module('app')
 */
 
   var fetchFriends = function(){
-    console.log(">>>>>>>>>", config.SERVER_URL);
-    return $http({method: 'GET',  url: config.SERVER_URL+"api/friends"})
+    return $http({method: 'GET', cache: true, url: config.SERVER_URL+"api/friends/"})
   }
 
 /*
@@ -78,7 +77,7 @@ var mergeOnlineStatusToFriendList = function(friends, onlineFriends){
 */
 
   var storeFriendList = function(friends){
-    angular.extend(self.friends, friends);
+    angular.extend(self.friends, friends); 
   }
 
 /*
@@ -89,7 +88,7 @@ var mergeOnlineStatusToFriendList = function(friends, onlineFriends){
 
   var subscribeToFriendsPresenceEvents = function() {
     // We listen to Presence events :
-    $rootScope.$on(Pubnub.getPresenceEventNameFor(self.channel_group), function (ngEvent, presenceEvent) {
+    $rootScope.$on(Pubnub.getMessageEventNameFor(self.channel_group+'-pnpres'), function (ngEvent, presenceEvent) {
       updateOnlineFriendList(presenceEvent);
     });
 
@@ -149,7 +148,7 @@ var mergeOnlineStatusToFriendList = function(friends, onlineFriends){
         subscribeToFriendsPresenceEvents();
 
         return self.friends
-
+    
     })
 
   }
@@ -173,9 +172,9 @@ var find = function(findObject){
  |--------------------------------------------------------------------------
 */
 
-  return {
+  return { 
     all: all,
     find: find
-  }
+  } 
 
 }]);

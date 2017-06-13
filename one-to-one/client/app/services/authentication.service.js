@@ -1,6 +1,6 @@
 angular.module('app')
-.factory('AuthenticationService', ['$rootScope','Pubnub','ngNotify', '$auth','currentUser', '$cacheFactory', '$http', 'config', '$location',
- function AuthenticationService($rootScope,Pubnub, ngNotify, $auth, currentUser, $cacheFactory, $http, config, $location) {
+.factory('AuthenticationService', ['$rootScope','Pubnub','ngNotify', '$auth','currentUser', '$cacheFactory', '$http', 'config', '$location', 'NotificationService',
+ function AuthenticationService($rootScope,Pubnub, ngNotify, $auth, currentUser, $cacheFactory, $http, config, $location, NotificationService) {
   
 	var whenDisconnected = function(){
 	  ngNotify.set('Connection lost. Trying to reconnect...', {
@@ -44,13 +44,12 @@ angular.module('app')
 	var clientSignout = function(){
 
   		var channels = [	
-								'conversation_channel_general', 
 								'user_presence_' + currentUser.get().id.toString()
 						]
 
 		var channel_groups = [ 
     								'friends_presence_' + currentUser.get().id.toString() +'-pnpres',
-    								'conversations_' + currentUser.get().id.toString()												
+    								'conversations_' + currentUser.get().id.toString()										
     						 ]
 
 		Pubnub.unsubscribe({ channel: channels });
@@ -70,11 +69,13 @@ angular.module('app')
   		Pubnub.set_uuid(currentUser.get().id) 
     	Pubnub.auth($auth.getToken())
 
-    	var channels = [	
-								  'conversation_channel_general', 
-								  // Automatically publish presence events on the own user presence channel
-								  'user_presence_' + currentUser.get().id.toString()  
-    					]
+  		var channels = [	
+								'user_presence_' + currentUser.get().id.toString() 
+						]
+
+		var channel_groups = [ 
+    								'friends_presence_' + currentUser.get().id.toString() +'-pnpres'										
+    						 ]
 
 	    Pubnub.subscribe({
 	          channel: channels,
@@ -85,16 +86,15 @@ angular.module('app')
 	          triggerEvents: true
 	    });
 
-	    var channel_groups = [ 
-    						    'friends_presence_' + currentUser.get().id.toString() +'-pnpres'														
-    						 ]
-
 	    Pubnub.subscribe({
 	          channel_group: channel_groups,
 	          noheresync: true,
 	          triggerEvents: ['callback']
 
-	    });    	
+	    });
+
+	    NotificationService.init();
+
 	    return true;
 
 	  });
