@@ -1,12 +1,18 @@
 <div class="chat">
-  <section class="chat-sidebar">
-    <user-menu></user-menu>
-    <channels></channels>
-    <friends-search-box></friends-search-box>
-    <friend-list></friend-list>
-  </section>
-
-  <section class="chat-main" ui-view>
-  </section>
+  <div class="sidebar-holder">
+  	<div class="holder">
+  		<section class="chat-sidebar">
+		    <user-menu></user-menu>
+		    <channels></channels>
+		    <friends-search-box></friends-search-box>
+		    <friend-list></friend-list>
+		</section>
+  	</div>
+  </div>
+  <div class="chat-box">
+  	<div class="holder">
+  		<section class="chat-main" ui-view></section>
+  	</div>
+  </div>
   
 </div>
