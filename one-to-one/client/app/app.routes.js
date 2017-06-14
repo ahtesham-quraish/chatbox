@@ -42,7 +42,7 @@ angular
           console.log("New model window added ");
       }
     })
-    
+
     .state('logout',{
         url: '/logout',
         template: null,
@@ -71,7 +71,7 @@ angular
 
         }
       })
-      $urlRouterProvider.when('/', '/conversations/channel/general');
+      $urlRouterProvider.when('/', '/conversations/private');
       // For any unmatched url, redirect to /login
       $urlRouterProvider.otherwise("/login");
 

@@ -32,7 +32,7 @@ angular.module('app').directive('conversation', function($rootScope) {
 
       $scope.usersTyping = UsersTyping.$channel($scope.conversationChannel+'-pnpres');
 
-
+      console.log(">>>>>>>>>", $scope.conservation);
       if (_.isEmpty($scope.conversation)){
            console.log(">>>>>>>>>", $scope.conservation);
            $scope.conversation.$load(10)

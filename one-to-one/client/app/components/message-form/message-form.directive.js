@@ -7,7 +7,7 @@ angular.module('app').directive('messageForm', function() {
       typingIndicator: "=",
       conversation: "="
     },
-    
+
     controller: function($scope, currentUser){
 
       $scope.sendMessage = function(){
@@ -17,8 +17,9 @@ angular.module('app').directive('messageForm', function() {
           }
 
             $scope.conversation.sendMessage($scope.messageContent).then(function(){
-                
+
               $scope.messageContent = '';
+
 
           })
 

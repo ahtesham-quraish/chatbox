@@ -1,5 +1,5 @@
-<ul class="message-list collection">
-  <li ng-class="{  'lmsender' : message.sender.login == user.login, 'lmreciever':message.sender.login != user.login }" class="collection-item message-item avatar" ng-repeat="message in messages track by message.uuid" repeat-complete="listDidRender()">
-    <message-item id="{{message.uuid}}" content="{{message.content}}" sender-uuid="{{message.sender.uuid}}" sender-login="{{message.sender.login}}" date="{{message.date}}"></message-item>
+<ul id="123" class="message-list collection">
+  <li  ng-class="{  'lmsender' : message.sender.login == user.login, 'lmreciever':message.sender.login != user.login }" class="collection-item message-item avatar" ng-repeat="message in messages track by message.uuid" ng-init="$last && listDidRender()" >
+    <message-item  id="{{message.uuid}}" content="{{message.content}}" sender-uuid="{{message.sender.uuid}}" sender-login="{{message.sender.login}}" date="{{message.date}}" message="message"></message-item>
   </li>
 </ul>

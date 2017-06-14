@@ -21,6 +21,7 @@ angular.module('app').directive('private', function($rootScope) {
                $scope.friendlist.push(friend);
                console.log("event,args",$scope.friendlist );
        });
+       console.log(">>>>>>>>>");
       // if ($stateParams.type == 'channel'){
       //
       //   $scope.conversationChannel = 'conversation_channel_'+ $stateParams.name
