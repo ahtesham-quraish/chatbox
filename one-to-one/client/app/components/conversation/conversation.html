@@ -1,12 +1,14 @@
 <div class="conversation">
 
-	<conversation-name-channel ng-if="conversationType == 'channel'"></conversation-name-channel>
+	<div class="conversation-holder">
+		<conversation-name-channel ng-if="conversationType == 'channel'"></conversation-name-channel>
 
-	<conversation-name-direct user="friend" ng-if="conversationType != 'channel'"></conversation-name-direct>
+		<conversation-name-direct user="friend" ng-if="conversationType != 'channel'"></conversation-name-direct>
 
-	<message-list messages="conversation"></message-list>
+		<message-list messages="conversation"></message-list>
 
-	<typing-indicator-box users-typing="usersTyping"></typing-indicator-box>
+		<typing-indicator-box users-typing="usersTyping"></typing-indicator-box>
 
-	<message-form conversation="conversation"></message-form>
+		<message-form conversation="conversation"></message-form>
+	</div>
 </div>

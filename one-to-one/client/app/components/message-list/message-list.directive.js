@@ -27,7 +27,7 @@ angular.module('app').directive('messageList', function($rootScope, $anchorScrol
 
         scope.messages.$load(20).then(function(){
 
-          // Scroll to the previous message 
+          // Scroll to the previous message
           _.defer( function(){ $anchorScroll(currentMessage) });
 
         });
@@ -50,13 +50,13 @@ angular.module('app').directive('messageList', function($rootScope, $anchorScrol
           }
         }
 
-        // Update the autoScrollDown value 
+        // Update the autoScrollDown value
         scope.autoScrollDown = hasScrollReachedBottom()
 
       };
 
       var init = function(){
-          
+
           // Watch the scroll and trigger actions
           element.bind("scroll", _.throttle(watchScroll,250));
       };
@@ -64,21 +64,22 @@ angular.module('app').directive('messageList', function($rootScope, $anchorScrol
       init();
 
     },
-    controller: function($scope){
+    controller: function($scope, currentUser){
 
- 
+
       $scope.autoScrollDown = true;
-
+      $scope.user = currentUser.get();
+      console.log("LLLLLLLLLLLL", $scope.user.login );
       // Hook that is called once the list is completely rendered
       $scope.listDidRender = function(){
-        
+
           if($scope.autoScrollDown)
               $scope.scrollToBottom()
 
       };
 
       $scope.scrollToBottom = function() {
-          
+
           var uuid_last_message = _.last($scope.messages).uuid;
           $anchorScroll(uuid_last_message);
 

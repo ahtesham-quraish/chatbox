@@ -1,7 +1,7 @@
 angular
-  .module('app')  
+  .module('app')
   .config(function ($stateProvider, $urlRouterProvider, $authProvider) {
- 
+
     // Redirect to the login page if not authenticated
     var requireAuthentication = function ($location, $auth, AuthenticationService) {
 
@@ -17,25 +17,37 @@ angular
       url: "/login",
       templateUrl: 'views/login.html'
     })
+
     .state('chat', {
       url: "/conversations",
       templateUrl: 'views/chat.html',
-      resolve: { 
+      resolve: {
             currentUser: function(currentUser){ return currentUser.fetch() },
             requireAuthentication: requireAuthentication,
             friends: function(Friends, requireAuthentication){ return Friends.all() },
             conversation: function(ConversationList, requireAuthentication){ return ConversationList.all() }
           }
     })
+    .state('chat.private', {
+      url: "/private",
+      template: '<private></private>',
+      controller: function(){
+          console.log("New model window added ");
+      }
+    })
     .state('chat.conversation', {
       url: "/:type/:name",
-      template: '<conversation></conversation>'    
+      template: '<conversation></conversation>',
+      controller: function(){
+          console.log("New model window added ");
+      }
     })
+    
     .state('logout',{
-        url: '/logout', 
+        url: '/logout',
         template: null,
-        controller: function(AuthenticationService, $location, ngNotify, $window, $state, $auth){          
-            
+        controller: function(AuthenticationService, $location, ngNotify, $window, $state, $auth){
+
             if(!$auth.isAuthenticated()){
               $location.path('/login');
             }
@@ -44,11 +56,11 @@ angular
               AuthenticationService.logout().catch(function(error) {
               // The logging out process failed on the server side
               if(error.status == 500){
-                ngNotify.set('Logout failed.', { type: 'error' }); 
-              }    
+                ngNotify.set('Logout failed.', { type: 'error' });
+              }
             }).finally(function(){
 
-              
+
               $location.path('/login');
               $window.location.reload()
 
@@ -56,7 +68,7 @@ angular
 
           }
 
-            
+
         }
       })
       $urlRouterProvider.when('/', '/conversations/channel/general');

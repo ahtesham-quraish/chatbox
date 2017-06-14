@@ -1,4 +1,8 @@
+<div class="msg-holder" ng-class="{  'msender' : senderLogin == user.login, 'mreciever':senderLogin != user.login }">
 <user-avatar uuid="{{senderUuid}}"></user-avatar>
-<span class="title">{{ senderLogin }}</span>
-<p><i class="prefix mdi-action-alarm"></i> {{ date | date:"MM/dd/yyyy 'at' h:mma"}}</p>
-<p>{{ content }}</p>
+<!-- <span class="title">{{ senderLogin }}</span> -->
+<!-- <p><i class="prefix mdi-action-alarm"></i> {{ date | date:"MM/dd/yyyy 'at' h:mma"}}</p> -->
+  <div class="message">
+    <p >{{ content }}</p>
+  </div>
+</div>
