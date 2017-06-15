@@ -13,7 +13,7 @@ angular.module('app').directive('conversation', function($rootScope) {
       $scope.conversation = null;
       //$scope.friend = null;
       $scope.conversationChannel = null;
-      console.log("i am doing some reasreach ", $scope);
+      //console.log("i am doing some reasreach ", Friends.find({login: $stateParams.name}));
 
       // if ($stateParams.type == 'channel'){
       //

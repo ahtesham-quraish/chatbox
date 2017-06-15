@@ -2,6 +2,7 @@ angular.module('app').directive('messageItem', function(currentUser) {
   return {
     restrict: "E",
     templateUrl: 'components/message-item/message-item.html',
+  
     scope: {
       senderUuid: "@",
       senderLogin: "@",

@@ -1,7 +1,11 @@
 <div class="online-user-list">
 	<div class="online-users-number valign-wrapper">
 	<user-avatar uuid="{{user.id}}"></user-avatar>
-		<span class="valign">Private conversation with <strong>{{user.login}}</strong></span>		
+	<div ng-if="user.online == true" class="online-status">
+			<i class="tiny material-icons online">lens</i> </div>
+	<div ng-if="user.online == false" class="online-status">
+			<i class="tiny material-icons offline">lens</i> </div>
+		<span class="valign"> <strong>{{user.login}}</strong></span>
 	</div>
-	
+
 </div>

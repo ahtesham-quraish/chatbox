@@ -12,16 +12,24 @@ angular.module('app').directive('private', function($rootScope) {
       // $scope.conversationChannel = null;
       // console.log("i am doing some reasreach ", $stateParams);
       //
+      //console.log("Friends", Friends.all());
       if($scope.friendlist == undefined){
         $scope.friendlist = [];
       }
       $scope.$on('event',function(event,args){
 
                var friend = Friends.find({login: args});
-               $scope.friendlist.push(friend);
-               console.log("event,args",$scope.friendlist );
+               var result = $.grep($scope.friendlist, function(e){ return e.login == friend.login; });
+               if(result.length == 0 ){
+                  $scope.friendlist.push(friend);
+               }
+              //  else if($scope.friendlist.length == 0 ){
+              //    $scope.friendlist.push(friend);
+              //  }
+
+               //console.log("event,args",$scope.friendlist );
        });
-       console.log(">>>>>>>>>");
+      // console.log(">>>>>>>>>");
       // if ($stateParams.type == 'channel'){
       //
       //   $scope.conversationChannel = 'conversation_channel_'+ $stateParams.name
