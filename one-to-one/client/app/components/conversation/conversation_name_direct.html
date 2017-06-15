@@ -1,11 +1,14 @@
 <div class="online-user-list">
-	<div class="online-users-number valign-wrapper">
-	<user-avatar uuid="{{user.id}}"></user-avatar>
-	<div ng-if="user.online == true" class="online-status">
-			<i class="tiny material-icons online">lens</i> </div>
-	<div ng-if="user.online == false" class="online-status">
-			<i class="tiny material-icons offline">lens</i> </div>
-		<span class="valign"> <strong>{{user.login}}</strong></span>
+	<div class="online-users-number">
+		<div class="inner-holder">
+			<div class="valign-wrapper">
+				<user-avatar uuid="{{user.id}}"></user-avatar>
+				<span class="valign"><strong>{{user.login}}</strong></span>
+			</div>
+		</div>
 	</div>
-
+	<div class="icons-holder">
+		<i class="material-icons remove-icon">remove</i>
+		<i class="material-icons close-icon">close</i>
+	</div>
 </div>
