@@ -98,10 +98,23 @@
 .conversation{
   letter-spacing: 0;
   display: inline-block;
-  vertical-align: top;
+  vertical-align: bottom;
   height: 50vh;
+  max-height: 450px;
   min-height: 350px;
-  margin: 0 0 0 5px;
+  margin: 0 0 0 10px;
+  position: relative;
+}
+.conversation.getrecentmsg:after{
+	position: absolute;
+	left: -7px;
+	top: -7px;
+	content: '';
+	width: 15px;
+	height: 15px;
+	background: red;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
 }
 .conversation-holder{
   display: flex;
@@ -232,5 +245,4 @@
 .conversation.minimize{
   min-height: inherit;
   height: 40px;
-  vertical-align: bottom;
 }
