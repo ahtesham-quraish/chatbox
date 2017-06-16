@@ -12,7 +12,7 @@ angular.module('app').directive('messageForm', function($rootScope) {
       scope.focusHandler = function(){
 
           $rootScope['cuurentChannel'] = scope.conversationChannel;
-            console.log("$rootScope", $rootScope);
+            //console.log("$rootScope", $rootScope);
       }
     },
 

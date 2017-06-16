@@ -13,6 +13,9 @@ angular.module('app').directive('private', function($rootScope) {
       // console.log("i am doing some reasreach ", $stateParams);
       //
       //console.log("Friends", Friends.all());
+      $scope.close = function(){
+          console.log("double parent");
+      }
       if($scope.friendlist == undefined){
         $scope.friendlist = [];
       }

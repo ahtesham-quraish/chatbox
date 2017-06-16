@@ -12,7 +12,20 @@ angular.module('app').directive('conversation', function($rootScope) {
     //  $scope.conversationType = $stateParams.type
       $scope.conversation = null;
       //$scope.friend = null;
+      $scope.miniize = false;
       $scope.conversationChannel = null;
+      $scope.getrecentmsg = $rootScope.getrecentmsg;
+      $scope.mini = function(login){
+         $scope.miniize = $scope.miniize == false ? true : false;
+         if(!$scope.miniize){
+           var id = '#'+login;
+           var idNo = $(id);
+           idNo.removeClass("getrecentmsg");
+         }
+      }
+      $scope.close = function(){
+        console.log("parent");
+      }
       //console.log("i am doing some reasreach ", Friends.find({login: $stateParams.name}));
 
       // if ($stateParams.type == 'channel'){

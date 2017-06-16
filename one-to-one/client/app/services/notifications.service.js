@@ -10,21 +10,31 @@ angular.module('app')
 
         $rootScope.$on(eventName, function(ngEvent, message, env){
             let channel = env[3];
-            console.log("i am taking some notes here ?????????" , message);
+
             // The user shouldn't receive his own messages
             if(message.sender.uuid.toString() === currentUser.get().id.toString()) return;
+            var id = '#'+message.sender.login;
+            var idNo = $(id);
 
             var avatarUrl = 'https://avatars.githubusercontent.com/u/' + message.sender.uuid+'?s=80';
+            if(idNo.hasClass('minimize')){
 
-            Push.create('Message from '+message.sender.login, {
-                body: message.content,
-                timeout: 5000,
-                icon: {
-                    x16: avatarUrl,
-                    x32: avatarUrl
+                $rootScope['getrecentmsg'] = true;
+                if(!idNo.hasClass('getrecentmsg')){
+                  idNo.addClass("getrecentmsg");
                 }
-            });
-
+                Push.create('Message from '+message.sender.login, {
+                    body: message.content,
+                    timeout: 5000,
+                    icon: {
+                        x16: avatarUrl,
+                        x32: avatarUrl
+                    }
+                });
+            }
+            else{
+                  idNo.removeClass("getrecentmsg");
+                }
         });
     }
 
